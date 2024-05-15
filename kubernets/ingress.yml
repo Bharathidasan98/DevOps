@@ -1,0 +1,65 @@
+
+#https://kind.sigs.k8s.io/docs/user/ingress/#create-cluster
+#https://github.com/infracloudio/boutique-assignment/blob/master/kind-config/config.yaml
+#https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+#https://github.com/apache/apisix-ingress-controller/blob/master/install.md
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+   name: myingress
+   annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  # ingressClassName: external-lb
+   rules:
+    - http:
+        paths:
+         - path: "/backend"
+           pathType: Exact #Prefix
+           backend:
+             service:
+               name: be-service
+               port:
+                 number: 8008
+         - path: "/mon"
+           pathType: Exact #Prefix
+           backend:
+             service:
+               name: mon-service
+               port:
+                 number: 8090
+         - path: "/frontend"
+           pathType: Exact #Prefix
+           backend:
+             service:
+               name: app-service
+               port:
+                 number: 8080
+---
+#apiVersion: networking.k8s.io/v1
+#kind: IngressClass
+#metadata:
+#  name: external-lb
+#spec:
+#  controller: example.com/ingress-controller
+#  parameters:
+#    apiGroup: k8s.example.com
+#    kind: IngressParameters
+#    name: external-lb
+#---
+#apiVersion: networking.k8s.io/v1
+#kind: IngressClass
+#metadata:
+#  name: external-lb-1
+#spec:
+#  controller: example.com/ingress-controller
+#  parameters:
+#    # The parameters for this IngressClass are specified in a
+#    # ClusterIngressParameter (API group k8s.example.net) named
+#    # "external-config-1". This definition tells Kubernetes to
+#    # look for a cluster-scoped parameter resource.
+#    scope: Cluster
+#    apiGroup: k8s.example.net
+#    kind: ClusterIngressParameter
+#    name: external-config-1
+

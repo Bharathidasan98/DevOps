@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prom-deployment
+  labels:
+    app: prom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prom
+  template:
+    metadata:
+      labels:
+        app: prom
+    spec:
+      containers:
+      - name: prom
+        image: ubuntu/prometheus
+        ports:
+        - containerPort: 9090
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mon-service
+spec:
+  type: ClusterIP
+  selector:
+     app: prom
+  ports:
+  - targetPort: 9090
+    port: 8090
+    name: prom-service
