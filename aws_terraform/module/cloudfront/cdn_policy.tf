@@ -4,34 +4,74 @@ resource "aws_cloudfront_cache_policy" "cdn_policy" {
   default_ttl = each.value.default_ttl
   max_ttl     = each.value.max_ttl
   min_ttl     = each.value.min_ttl
-  name        = each.value.name
-  dynamic "parameters_in_cache_key_and_forwarded_to_origin" {
-    for_each = each.value.parameters_in_cache_key_and_forwarded_to_origin
-    content {
-      cookies_config {
-        cookie_behavior = parameters_in_cache_key_and_forwarded_to_origin.value.cookie_behavior
-        cookies {
-          items = parameters_in_cache_key_and_forwarded_to_origin.value.cookies != null ? parameters_in_cache_key_and_forwarded_to_origin.value.cookies.items : []
-        }
-
-      }
-      enable_accept_encoding_brotli = parameters_in_cache_key_and_forwarded_to_origin.value.enable_accept_encoding_brotli
-      enable_accept_encoding_gzip   = parameters_in_cache_key_and_forwarded_to_origin.value.enable_accept_encoding_gzip
-      headers_config {
-        header_behavior = parameters_in_cache_key_and_forwarded_to_origin.value.header_behavior
-        headers {
-          items = parameters_in_cache_key_and_forwarded_to_origin.value.headers != null ? parameters_in_cache_key_and_forwarded_to_origin.value.headers.items : []
+  name        = each.key
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = each.value.cookie_behavior
+      dynamic "cookies" {
+        for_each = each.value.var_cookies != null ? [each.value.var_cookies] : []
+        content {
+          items = cookies.value.items
         }
       }
-      query_strings_config {
-        query_string_behavior = parameters_in_cache_key_and_forwarded_to_origin.value.query_string_behavior
-        query_strings {
-          items = parameters_in_cache_key_and_forwarded_to_origin.value.query_strings != null ? parameters_in_cache_key_and_forwarded_to_origin.value.query_strings.items : []
+    }
+    enable_accept_encoding_brotli = each.value.enable_accept_encoding_brotli
+    enable_accept_encoding_gzip   = each.value.enable_accept_encoding_gzip
+    headers_config {
+      header_behavior = each.value.header_behavior
+      dynamic "headers" {
+        for_each = each.value.var_headers != null ? [each.value.var_headers] : []
+        content {
+          items = headers.value.items
+        }
+      }
+    }
+    query_strings_config {
+      query_string_behavior = each.value.query_string_behavior
+      dynamic "query_strings" {
+        for_each = each.value.var_query_strings != null ? [each.value.var_query_strings] : []
+        content {
+          items = query_strings.value.items
         }
       }
     }
   }
 }
+
+#resource "aws_cloudfront_cache_policy" "cdn_policy" {
+#  for_each    = var.var_cdn_policy
+#  comment     = each.value.comment
+#  default_ttl = each.value.default_ttl
+#  max_ttl     = each.value.max_ttl
+#  min_ttl     = each.value.min_ttl
+#  name        = each.value.name
+#  dynamic "parameters_in_cache_key_and_forwarded_to_origin" {
+#    for_each = each.value.parameters_in_cache_key_and_forwarded_to_origin
+#    content {
+#      cookies_config {
+#        cookie_behavior = parameters_in_cache_key_and_forwarded_to_origin.value.cookie_behavior
+#        cookies {
+#          items = parameters_in_cache_key_and_forwarded_to_origin.value.cookies != null ? parameters_in_cache_key_and_forwarded_to_origin.value.cookies.items : []
+#        }
+#
+#      }
+#      enable_accept_encoding_brotli = parameters_in_cache_key_and_forwarded_to_origin.value.enable_accept_encoding_brotli
+#      enable_accept_encoding_gzip   = parameters_in_cache_key_and_forwarded_to_origin.value.enable_accept_encoding_gzip
+#      headers_config {
+#        header_behavior = parameters_in_cache_key_and_forwarded_to_origin.value.header_behavior
+#        headers {
+#          items = parameters_in_cache_key_and_forwarded_to_origin.value.headers != null ? parameters_in_cache_key_and_forwarded_to_origin.value.headers.items : []
+#        }
+#      }
+#      query_strings_config {
+#        query_string_behavior = parameters_in_cache_key_and_forwarded_to_origin.value.query_string_behavior
+#        query_strings {
+#          items = parameters_in_cache_key_and_forwarded_to_origin.value.query_strings != null ? parameters_in_cache_key_and_forwarded_to_origin.value.query_strings.items : []
+#        }
+#      }
+#    }
+#  }
+#}
 output "op_cache_policy_id" {
   value = {
     for k, v in aws_cloudfront_cache_policy.cdn_policy : k => v.id

@@ -108,35 +108,58 @@ variable "var_cdn_cdn" {
   }))
 }
 
+#variable "var_cdn_policy" {
+#  type = map(object({
+#    #globalvariable
+#    comment     = string
+#    default_ttl = number
+#    max_ttl     = number
+#    min_ttl     = number
+#    name        = string
+#    #parameters_in_cache_key_and_forwarded_to_origin
+#    parameters_in_cache_key_and_forwarded_to_origin = map(object({
+#      cookie_behavior = string
+#      cookies = optional(object({
+#        items = list(string)
+#      }), null)
+#      enable_accept_encoding_brotli = bool
+#      enable_accept_encoding_gzip   = bool
+#      header_behavior               = string
+#      headers = optional(object({
+#        items = list(string)
+#      }), null)
+#      query_string_behavior = string
+#      query_strings = optional(object({
+#        items = list(string)
+#      }), null)
+#    }))
+#  }))
+#}
+
 variable "var_cdn_policy" {
   type = map(object({
     #globalvariable
-    comment     = string
+    comment     = optional(string)
     default_ttl = number
     max_ttl     = number
     min_ttl     = number
-    name        = string
     #parameters_in_cache_key_and_forwarded_to_origin
-    parameters_in_cache_key_and_forwarded_to_origin = map(object({
       cookie_behavior = string
-      cookies = optional(object({
+      var_cookies = optional(object({
         items = list(string)
       }), null)
       enable_accept_encoding_brotli = bool
       enable_accept_encoding_gzip   = bool
       header_behavior               = string
-      headers = optional(object({
+      var_headers = optional(object({
         items = list(string)
       }), null)
       query_string_behavior = string
-      query_strings = optional(object({
+      var_query_strings = optional(object({
         items = list(string)
       }), null)
     }))
-  }))
 }
-
-
 
 
 
