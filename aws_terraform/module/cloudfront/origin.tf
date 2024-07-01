@@ -72,51 +72,54 @@
 resource "aws_cloudfront_distribution" "distribution" {
   for_each = var.var_cdn_cdn
   aliases  = each.value.aliases
-  origin {
-    domain_name         = each.value.domain_name #lookup(var_cdn_cdn.value, "domain_name", null )
-    origin_id           = each.value.origin_id
-    connection_attempts = each.value.connection_attempts
-    connection_timeout  = each.value.connection_timeout
-    #  s3_origin_config {
-    #    origin_access_identity = each.value.s3_origin_config !=null ? each.value.s3_origin_config.origin_access_identity  : ""
-    #}
-    dynamic "s3_origin_config" {
-      for_each = each.value.s3_origin_config != null ? [each.value.s3_origin_config] : []
-      content {
-        origin_access_identity = s3_origin_config.value.origin_access_identity
+  dynamic "origin" {
+    for_each = each.value.origin
+    content {
+      domain_name         = origin.value.domain_name
+      origin_id           = origin.value.origin_id
+      connection_attempts = origin.value.connection_attempts
+      connection_timeout  = origin.value.connection_timeout
+      #  s3_origin_config {
+      #    origin_access_identity = each.value.s3_origin_config !=null ? each.value.s3_origin_config.origin_access_identity  : ""
+      #}
+      dynamic "s3_origin_config" {
+        for_each = origin.value.s3_origin_config != null ? [origin.value.s3_origin_config] : []
+        content {
+          origin_access_identity = origin.value.s3_origin_config.origin_access_identity
+        }
       }
-    }
-    dynamic "custom_origin_config" {
-      for_each = each.value.custom_origin_config != null ? [each.value.custom_origin_config] : []
-      content {
-        http_port                = custom_origin_config.value.http_port
-        https_port               = custom_origin_config.value.https_port
-        origin_keepalive_timeout = custom_origin_config.value.origin_keepalive_timeout
-        origin_protocol_policy   = custom_origin_config.value.origin_protocol_policy
-        origin_read_timeout      = custom_origin_config.value.origin_read_timeout
-        origin_ssl_protocols     = custom_origin_config.value.origin_ssl_protocols
+      dynamic "custom_origin_config" {
+        for_each = origin.value.custom_origin_config != null ? [origin.value.custom_origin_config] : []
+        content {
+          http_port                = origin.value.custom_origin_config.http_port
+          https_port               = origin.value.custom_origin_config.https_port
+          origin_keepalive_timeout = origin.value.custom_origin_config.origin_keepalive_timeout
+          origin_protocol_policy   = origin.value.custom_origin_config.origin_protocol_policy
+          origin_read_timeout      = origin.value.custom_origin_config.origin_read_timeout
+          origin_ssl_protocols     = origin.value.custom_origin_config.origin_ssl_protocols
+        }
       }
+      #       dynamic "s3_origin_config" {
+      #      for_each = each.value.s3_origin_config != null ? [each.value.s3_origin_config] : []
+      #
+      #      content {
+      #        origin_access_identity = s3_origin_config.value.origin_access_identity
+      #      }
+      #    }
+      #
+      #    dynamic "custom_origin_config" {
+      #      for_each = each.value.custom_origin_config != null ? [each.value.custom_origin_config] : []
+      #
+      #      content {
+      #        http_port                = custom_origin_config.value.http_port
+      #        https_port               = custom_origin_config.value.https_port
+      #        origin_keepalive_timeout = custom_origin_config.value.origin_keepalive_timeout
+      #        origin_protocol_policy   = custom_origin_config.value.origin_protocol_policy
+      #        origin_read_timeout      = custom_origin_config.value.origin_read_timeout
+      #        origin_ssl_protocols     = custom_origin_config.value.origin_ssl_protocols
+      #      }
+      #    }
     }
-    #       dynamic "s3_origin_config" {
-    #      for_each = each.value.s3_origin_config != null ? [each.value.s3_origin_config] : []
-    #
-    #      content {
-    #        origin_access_identity = s3_origin_config.value.origin_access_identity
-    #      }
-    #    }
-    #
-    #    dynamic "custom_origin_config" {
-    #      for_each = each.value.custom_origin_config != null ? [each.value.custom_origin_config] : []
-    #
-    #      content {
-    #        http_port                = custom_origin_config.value.http_port
-    #        https_port               = custom_origin_config.value.https_port
-    #        origin_keepalive_timeout = custom_origin_config.value.origin_keepalive_timeout
-    #        origin_protocol_policy   = custom_origin_config.value.origin_protocol_policy
-    #        origin_read_timeout      = custom_origin_config.value.origin_read_timeout
-    #        origin_ssl_protocols     = custom_origin_config.value.origin_ssl_protocols
-    #      }
-    #    }
   }
 
   enabled             = each.value.enabled

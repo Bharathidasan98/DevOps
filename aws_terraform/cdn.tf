@@ -1,20 +1,36 @@
 module "cdn" {
-  source = "../../modules/cloudfront"
-  var_cdn_cdn = {
+  source = "/Users/Bharathidasan.m/mydiary/may2024/terraform/DevOps/aws_terraform/modules/cloudfront"
+  var_cdn_distribution = {
     EFIECHIC5W79K = {
       aliases              = ["*.hevodata.com", "hevodata.com"]
-      domain_name          = "website-123371169.ap-southeast-1.elb.amazonaws.com"
-      origin_id            = "website-123371169.ap-southeast-1.elb.amazonaws.com"
-      connection_attempts  = 3
-      connection_timeout   = 10
-      custom_origin_config = {
-        http_port                = 80
-        https_port               = 443
-        origin_keepalive_timeout = 5
-        origin_protocol_policy   = "match-viewer"
-        origin_read_timeout      = 30
-        origin_ssl_protocols     = ["TLSv1.2"]
-      }
+      origin = [
+        {
+          domain_name          = "website-123371169.ap-southeast-1.elb.amazonaws.com"
+          origin_id            = "website-123371169.ap-southeast-1.elb.amazonaws.com"
+          connection_attempts  = 3
+          connection_timeout   = 10
+          custom_origin_config = {
+            http_port                = 80
+            https_port               = 443
+            origin_keepalive_timeout = 5
+            origin_protocol_policy   = "match-viewer"
+            origin_read_timeout      = 30
+            origin_ssl_protocols     = ["TLSv1.2"]
+          }
+        }, {
+          domain_name          = "usprodmkt-wordpress-1698395705.us-east-1.elb.amazonaws.com"
+          origin_id            = "wordpress"
+          connection_attempts  = 3
+          connection_timeout   = 10
+          custom_origin_config = {
+            http_port                = 80
+            https_port               = 443
+            origin_keepalive_timeout = 5
+            origin_protocol_policy   = "match-viewer"
+            origin_read_timeout      = 30
+            origin_ssl_protocols     = ["TLSv1.2"]
+          }
+        }]
       #default_cache_behavior attributes
       cached_methods                 = ["GET", "HEAD"]
       allowed_methods                = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -54,7 +70,7 @@ module "cdn" {
           origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3"
           path_pattern             = "/learn/*.css"
           smooth_streaming         = false
-          target_origin_id         = "website-123371169.ap-southeast-1.elb.amazonaws.com"
+          target_origin_id         = "wordpress"
           viewer_protocol_policy   = "allow-all"
         },
         {
@@ -68,7 +84,7 @@ module "cdn" {
           origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3"
           path_pattern             = "/learn/*.js"
           smooth_streaming         = false
-          target_origin_id         = "website-123371169.ap-southeast-1.elb.amazonaws.com"
+          target_origin_id         = "wordpress"
           viewer_protocol_policy   = "allow-all"
         },
         {
@@ -82,7 +98,7 @@ module "cdn" {
           origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3"
           path_pattern             = "/blog/*.css"
           smooth_streaming         = false
-          target_origin_id         = "website-123371169.ap-southeast-1.elb.amazonaws.com"
+          target_origin_id         = "wordpress"
           viewer_protocol_policy   = "allow-all"
         }, {
           allowed_methods          = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -95,7 +111,7 @@ module "cdn" {
           origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3"
           path_pattern             = "/blog/*.js"
           smooth_streaming         = false
-          target_origin_id         = "website-123371169.ap-southeast-1.elb.amazonaws.com"
+          target_origin_id         = "wordpress"
           viewer_protocol_policy   = "allow-all"
         },{
           allowed_methods             = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -111,9 +127,47 @@ module "cdn" {
           max_ttl                  = 0
           min_ttl                  = 0
           origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3"
+          path_pattern             = "/learn"
+          smooth_streaming         = false
+          target_origin_id         = "wordpress"
+          viewer_protocol_policy   = "allow-all"
+        },
+        {
+          allowed_methods             = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+          cache_policy_id             = "${module.cdn.op_cache_policy_id["blog-custom-cache-policy"]}"
+          cached_methods              = ["GET", "HEAD"]
+          compress                    = true
+          default_ttl                 = 0
+          lambda_function_association = {
+            event_type   = "origin-response"
+            include_body = false
+            lambda_arn   = "${module.lambda.op_lambda_arn["asia-dev-blog-cache-html"]}"
+          }
+          max_ttl                  = 0
+          min_ttl                  = 0
+          origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3"
           path_pattern             = "/learn/*"
           smooth_streaming         = false
-          target_origin_id         = "website-123371169.ap-southeast-1.elb.amazonaws.com"
+          target_origin_id         = "wordpress"
+          viewer_protocol_policy   = "allow-all"
+        },
+        {
+          allowed_methods             = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+          cache_policy_id             = "${module.cdn.op_cache_policy_id["blog-custom-cache-policy"]}"
+          cached_methods              = ["GET", "HEAD"]
+          compress                    = true
+          default_ttl                 = 0
+          lambda_function_association = {
+            event_type   = "origin-response"
+            include_body = false
+            lambda_arn   = "${module.lambda.op_lambda_arn["asia-dev-blog-cache-html"]}"
+          }
+          max_ttl                  = 0
+          min_ttl                  = 0
+          origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3"
+          path_pattern             = "/blog"
+          smooth_streaming         = false
+          target_origin_id         = "wordpress"
           viewer_protocol_policy   = "allow-all"
         },
         {
@@ -132,7 +186,7 @@ module "cdn" {
           origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3"
           path_pattern             = "/blog/*"
           smooth_streaming         = false
-          target_origin_id         = "website-123371169.ap-southeast-1.elb.amazonaws.com"
+          target_origin_id         = "wordpress"
           viewer_protocol_policy   = "allow-all"
         },
         {

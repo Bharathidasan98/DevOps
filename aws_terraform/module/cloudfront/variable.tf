@@ -42,21 +42,23 @@
 variable "var_cdn_cdn" {
   type = map(object({
     aliases             = list(string)
-    domain_name         = string
-    origin_id           = string
-    connection_attempts = number
-    connection_timeout  = number
-    s3_origin_config = optional(object({
-      origin_access_identity = optional(string, null)
-    }), null)
-    custom_origin_config = optional(object({
-      http_port                = optional(number, null)
-      https_port               = optional(number, null)
-      origin_keepalive_timeout = optional(number, null)
-      origin_protocol_policy   = optional(string, null)
-      origin_read_timeout      = optional(number, null)
-      origin_ssl_protocols     = optional(list(string), null)
-    }), null)
+    origin = list(object({
+      domain_name         = string
+      origin_id           = string
+      connection_attempts = number
+      connection_timeout  = number
+      s3_origin_config    = optional(object({
+        origin_access_identity = optional(string, null)
+      }), null)
+      custom_origin_config = optional(object({
+        http_port                = optional(number, null)
+        https_port               = optional(number, null)
+        origin_keepalive_timeout = optional(number, null)
+        origin_protocol_policy   = optional(string, null)
+        origin_read_timeout      = optional(number, null)
+        origin_ssl_protocols     = optional(list(string), null)
+      }), null)
+    }))
     enabled                        = bool
     is_ipv6_enabled                = bool
     default_root_object            = string
